@@ -30,7 +30,6 @@ class _ReadMoreState extends State<ReadMore> with SingleTickerProviderStateMixin
   Widget itemWidget;
   AnimationController animationController;
   Animation<double> animation;
-  Animation<double> animationOpacity;
 
 
   @override
@@ -67,13 +66,12 @@ class _ReadMoreState extends State<ReadMore> with SingleTickerProviderStateMixin
     itemWidget = widget.widgetItem;
 
     animation = Tween<double>(begin: widget.boundHeight, end: height + moreHeight).animate(animationController);
-    animationOpacity = Tween<double>(begin: 0.3, end: 1.0).animate(animationController);
 
     return AnimatedBuilder(
       animation: animationController,
       builder: (builder, context){
+        print("animation Controller value : ${animationController.value}");
         print("animation value : ${animation.value}");
-        print("opactity value : ${animationOpacity.value}");
         return Stack(
           children: <Widget>[
             expand
@@ -81,7 +79,7 @@ class _ReadMoreState extends State<ReadMore> with SingleTickerProviderStateMixin
                 child: Container(
                   height: animation.value,
                   child:
-                  _animateShadermask(itemWidget, animationOpacity)
+                  _animateShadermask(itemWidget, animationController)
                 ))
                 : ClipPath(
                 clipper: ReadMoreClipper(width: moreWidth, height: moreHeight),
@@ -90,7 +88,7 @@ class _ReadMoreState extends State<ReadMore> with SingleTickerProviderStateMixin
                   height: height > widget.boundHeight ? animation.value : null,
                   child: (heightCount)
                       ? height > widget.boundHeight
-                      ? _animateShadermask(itemWidget, animationOpacity)
+                      ? _animateShadermask(itemWidget, animationController)
                       : itemWidget
                       : Container(),
                 )),
@@ -138,13 +136,13 @@ class _ReadMoreState extends State<ReadMore> with SingleTickerProviderStateMixin
 
   }
 
-  Widget _animateShadermask(Widget itemWidget, Animation<double> animateOpacity){
+  Widget _animateShadermask(Widget itemWidget, AnimationController animation){
     return ShaderMask(
         shaderCallback: (rect) {
           return LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.black, Colors.transparent.withOpacity(animationOpacity.value)],
+            colors: [Colors.black, Colors.transparent.withOpacity(animationController.value)],
           ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
         },
         blendMode: BlendMode.dstIn,
